@@ -1,54 +1,51 @@
-import { Schema, model, Document, ObjectId } from 'mongoose';
+import { Schema, model, type Document } from 'mongoose';
+import reactionSchema from "./Reaction.js";
+import getFormatDate from "../utils/timestamp.js"
 
 interface IThought extends Document {
-    assignmentId: Schema.Types.ObjectId,
-    name: string,
-    score: number
+    thoughttext: string,
+    createdate: Schema.Types.Date,
+    username: string,
+    reactions: [typeof reactionSchema]
 }
 
 const thoughtSchema = new Schema<IThought>(
     {
-        assignmentId: {
-            
-        },
-        name: {
+        thoughttext: {
             type: String,
             required: true,
-            maxlength: 50,
-            minlength: 4,
-            default: 'Unnamed assignment',
+            maxlength: 180,
+            minlength: 1,
+
         },
-        score: {
-            type: Number,
+        createdate: {
+            type: Date,
+            default: Date.now,
+            get: (timestamp:any) => getFormatDate(timestamp)
+            
+        },
+        username: {
+            type: String,
             required: true,
-            default: () => Math.floor(Math.random() * (100 - 70 + 1) + 70),
+            
         },
+        reactions: [
+            reactionSchema
+        ]
+          
+
+        
     },
     {
-        timestamps: true,
-        _id: false
+        toJSON: {
+            getters: true,
+        }
     }
 );
 
+const Thought = model<IThought>('User', thoughtSchema);
+
+export default Thought;
 
 
 
-Thought
-
-thoughtText
-
-String
-Required
-Must be between 1 and 280 characters
-createdAt
-
-Date
-Set default value to the current timestamp
-Use a getter method to format the timestamp on query
-username (The user that created this thought)
-
-String
-Required
-reactions (These are like replies)
-
-Array of nested documents created with the reactionSchema
